@@ -102,15 +102,15 @@
     <div id="resultado"></div>
 
     <script>
-        document.getElementById("datosForm").addEventListener("submit", async function(event) {
-            event.preventDefault();
+      document.getElementById("datosForm").addEventListener("submit", async function(event) {
+          event.preventDefault();
 
-            const nombre = this.nombre.value.trim();
-            const edad = this.edad.value.trim();
-            const sexo = this.sexo.value;
-            const ejercicio = this.ejercicio.value.trim();
+          const nombre = this.nombre.value.trim();
+          const edad = this.edad.value.trim();
+          const sexo = this.sexo.value;
+          const ejercicio = this.ejercicio.value.trim();
 
-            const prompt = `Crea una dieta personalizada para una persona con las siguientes características:
+          const prompt = `Crea una dieta personalizada para una persona con las siguientes características:
 - Nombre: ${nombre}
 - Edad: ${edad} años
 - Sexo: ${sexo}
@@ -118,22 +118,21 @@
 
 Por favor, sugiere un plan alimenticio equilibrado y saludable.`;
 
-            try {
-                const response = await fetch("https://healthy-zone.onrender.com", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ prompt })
-                });
+          try {
+              const response = await fetch("https://healthy-zone.onrender.com/generar-dieta", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ prompt })
+              });
 
-                if (!response.ok) throw new Error("Error en el servidor: " + response.statusText);
+              if (!response.ok) throw new Error("Error en el servidor: " + response.statusText);
 
-                const data = await response.json();
-                document.getElementById("resultado").textContent = data.dieta;
-            } catch (error) {
-                document.getElementById("resultado").textContent = "Hubo un error: " + error.message;
-            }
-        });
+              const data = await response.json();
+              document.getElementById("resultado").textContent = data.dieta;
+          } catch (error) {
+              document.getElementById("resultado").textContent = "Hubo un error: " + error.message;
+          }
+      });
     </script>
 </body>
 </html>
-
