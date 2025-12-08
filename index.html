@@ -119,7 +119,7 @@
 Por favor, sugiere un plan alimenticio equilibrado y saludable.`;
 
             try {
-                const response = await fetch("https://TU_BACKEND_EN_RENDER.onrender.com/generar-dieta", {
+                const response = await fetch("https://healthy-zone.onrender.com", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ prompt })
@@ -136,3 +136,4 @@ Por favor, sugiere un plan alimenticio equilibrado y saludable.`;
     </script>
 </body>
 </html>
+
