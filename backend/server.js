@@ -1,20 +1,19 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { Configuration, OpenAIApi } from "openai";
+import OpenAI from "openai";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors()); // Permite que el frontend acceda al backend
-app.use(express.json()); // Para leer JSON del cuerpo de las peticiones
+app.use(cors());
+app.use(express.json());
 
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-const openai = new OpenAIApi(configuration);
 
 app.post("/generar-dieta", async (req, res) => {
   try {
@@ -23,13 +22,13 @@ app.post("/generar-dieta", async (req, res) => {
       return res.status(400).json({ error: "Falta el prompt" });
     }
 
-    const response = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo", // Puedes cambiar a "gpt-4" si tienes acceso
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: prompt }],
       max_tokens: 500,
     });
 
-    const dieta = response.data.choices[0].message.content;
+    const dieta = response.choices[0].message.content;
     res.json({ dieta });
   } catch (error) {
     console.error("Error en OpenAI:", error);
