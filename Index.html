@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Formulario de Datos Personales</title>
+</head>
+<body>
+    <h1>Formulario de Datos</h1>
+    <form id="datosForm">
+        <label for="nombre">Nombre:</label><br/>
+        <input type="text" id="nombre" name="nombre" required /><br/><br/>
+
+        <label for="edad">Edad:</label><br/>
+        <input type="number" id="edad" name="edad" min="0" required /><br/><br/>
+
+        <label>Sexo:</label><br/>
+        <input type="radio" id="sexo_m" name="sexo" value="Masculino" required />
+        <label for="sexo_m">Masculino</label><br/>
+        <input type="radio" id="sexo_f" name="sexo" value="Femenino" required />
+        <label for="sexo_f">Femenino</label><br/>
+        <input type="radio" id="sexo_o" name="sexo" value="Otro" required />
+        <label for="sexo_o">Otro</label><br/><br/>
+
+        <label for="ejercicio">Cantidad de ejercicio semanal (horas):</label><br/>
+        <input type="number" id="ejercicio" name="ejercicio" min="0" step="0.1" required /><br/><br/>
+
+        <button type="submit">Enviar</button>
+    </form>
+
+    <div id="resultado" style="margin-top:20px; font-weight:bold;"></div>
+
+    <script>
+        const form = document.getElementById('datosForm');
+        const resultadoDiv = document.getElementById('resultado');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Evita que se recargue la página
+
+            const nombre = form.nombre.value;
+            const edad = form.edad.value;
+            const sexo = form.sexo.value;
+            const ejercicio = form.ejercicio.value;
+
+            resultadoDiv.textContent = `Hola ${nombre}, tienes ${edad} años, sexo: ${sexo}, y haces ${ejercicio} horas de ejercicio a la semana.`;
+        });
+    </script>
+</body>
+</html>
