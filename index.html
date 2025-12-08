@@ -3,38 +3,105 @@
 <head>
     <meta charset="UTF-8" />
     <title>Formulario de Datos Personales</title>
+    <style>
+        /* Fondo amarillo y texto negro para toda la página */
+        body {
+            background-color: #FFEB3B; /* amarillo brillante */
+            color: #000000; /* negro */
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        /* Estilo para el contenedor del formulario */
+        form {
+            background-color: #000000; /* negro */
+            color: #FFEB3B; /* amarillo */
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* Estilo para las etiquetas y campos de entrada */
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        /* Estilo para los botones de opción */
+        input[type="radio"] {
+            margin-right: 5px;
+        }
+
+        /* Botón con color amarillo y texto negro */
+        button {
+            margin-top: 20px;
+            background-color: #FFEB3B;
+            color: #000000;
+            border: none;
+            padding: 10px 15px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #f2d600;
+        }
+
+        /* Estilo para el texto de resultado */
+        #resultado {
+            max-width: 400px;
+            margin: 20px auto;
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #000000;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <h1>Formulario de Datos</h1>
+    <h1 style="text-align: center;">Formulario de Datos</h1>
     <form id="datosForm">
-        <label for="nombre">Nombre:</label><br/>
-        <input type="text" id="nombre" name="nombre" required /><br/><br/>
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required />
 
-        <label for="edad">Edad:</label><br/>
-        <input type="number" id="edad" name="edad" min="0" required /><br/><br/>
+        <label for="edad">Edad:</label>
+        <input type="number" id="edad" name="edad" min="0" required />
 
-        <label>Sexo:</label><br/>
+        <label>Sexo:</label>
         <input type="radio" id="sexo_m" name="sexo" value="Masculino" required />
-        <label for="sexo_m">Masculino</label><br/>
+        <label for="sexo_m" style="display: inline;">Masculino</label><br/>
         <input type="radio" id="sexo_f" name="sexo" value="Femenino" required />
-        <label for="sexo_f">Femenino</label><br/>
+        <label for="sexo_f" style="display: inline;">Femenino</label><br/>
         <input type="radio" id="sexo_o" name="sexo" value="Otro" required />
-        <label for="sexo_o">Otro</label><br/><br/>
+        <label for="sexo_o" style="display: inline;">Otro</label>
 
-        <label for="ejercicio">Cantidad de ejercicio semanal (horas):</label><br/>
-        <input type="number" id="ejercicio" name="ejercicio" min="0" step="0.1" required /><br/><br/>
+        <label for="ejercicio">Cantidad de ejercicio semanal (horas):</label>
+        <input type="number" id="ejercicio" name="ejercicio" min="0" step="0.1" required />
 
         <button type="submit">Enviar</button>
     </form>
 
-    <div id="resultado" style="margin-top:20px; font-weight:bold;"></div>
+    <div id="resultado"></div>
 
     <script>
         const form = document.getElementById('datosForm');
         const resultadoDiv = document.getElementById('resultado');
 
         form.addEventListener('submit', function(event) {
-            event.preventDefault(); // Evita que se recargue la página
+            event.preventDefault();
 
             const nombre = form.nombre.value;
             const edad = form.edad.value;
