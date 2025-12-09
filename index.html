@@ -4,75 +4,110 @@
     <meta charset="UTF-8" />
     <title>Formulario de Datos Personales - Generar Dieta</title>
     <style>
-        /* Fondo amarillo y texto negro para toda la página */
+        /* Estilos base */
         body {
-            background-color: #FFEB3B; /* amarillo brillante */
-            color: #000000; /* negro */
+            background-color: #FFEB3B;
+            color: #000000;
             font-family: Arial, sans-serif;
-            padding: 20px;
+            padding: 20px 10px;
+            margin: 0;
+            box-sizing: border-box;
         }
 
-        /* Estilo para el contenedor del formulario */
         form {
-            background-color: #000000; /* negro */
-            color: #FFEB3B; /* amarillo */
+            background-color: #000000;
+            color: #FFEB3B;
             padding: 20px;
             border-radius: 10px;
             max-width: 400px;
-            margin: auto;
+            margin: 20px auto;
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            box-sizing: border-box;
         }
 
-        /* Estilo para las etiquetas y campos de entrada */
         label {
             display: block;
             margin-top: 15px;
             font-weight: bold;
+            font-size: 1rem;
         }
 
         input[type="text"],
         input[type="number"] {
             width: 100%;
-            padding: 8px;
+            padding: 12px;
             margin-top: 5px;
             border: none;
             border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box;
         }
 
-        /* Estilo para los botones de opción */
         input[type="radio"] {
-            margin-right: 5px;
+            margin-right: 8px;
+            transform: scale(1.2);
+            vertical-align: middle;
         }
 
-        /* Botón con color amarillo y texto negro */
         button {
-            margin-top: 20px;
+            margin-top: 25px;
             background-color: #FFEB3B;
             color: #000000;
             border: none;
-            padding: 10px 15px;
+            padding: 15px 20px;
             font-weight: bold;
             border-radius: 5px;
             cursor: pointer;
+            width: 100%;
+            font-size: 1.1rem;
         }
 
         button:hover {
             background-color: #f2d600;
         }
 
-        /* Estilo para el texto de resultado */
+        /* Resultado */
         #resultado {
             max-width: 400px;
             margin: 20px auto;
             font-weight: bold;
             font-size: 1.1em;
             color: #000000;
-            background-color: #FFF9C4; /* amarillo claro */
+            background-color: #FFF9C4;
             border: 2px solid #000000;
             padding: 15px;
             border-radius: 10px;
             text-align: center;
-            white-space: pre-wrap; /* para mostrar saltos de línea */
+            white-space: pre-wrap;
+            box-sizing: border-box;
+        }
+
+        /* Ajustes para pantallas pequeñas */
+        @media (max-width: 450px) {
+            body {
+                padding: 10px 5px;
+            }
+
+            form, #resultado {
+                max-width: 100%;
+                margin: 10px auto;
+                padding: 15px;
+            }
+
+            button {
+                padding: 12px;
+                font-size: 1rem;
+            }
+
+            input[type="text"],
+            input[type="number"] {
+                padding: 10px;
+                font-size: 1rem;
+            }
+
+            label {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
