@@ -25,6 +25,7 @@ app.post("/generar-dieta", async (req, res) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        model: "gpt2",  // Aquí defines el modelo que quieres usar
         inputs: prompt,
         parameters: {
           max_new_tokens: 500,
