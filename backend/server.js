@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import fetch from "node-fetch"; // Asegúrate de instalar node-fetch
+import fetch from "node-fetch"; // Necesitas instalar node-fetch si usas Node <18
 
 dotenv.config();
 
@@ -11,24 +11,29 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Token de Hugging Face guardado en .env
-const HF_TOKEN = process.env.HUGGINGFACE_API_TOKEN;
-const MODEL = "gpt2"; // Puedes cambiar por otro modelo si quieres
+const HF_TOKEN = process.env.HUGGINGFACE_API_TOKEN; // Tu token Hugging Face
 
 app.post("/generar-dieta", async (req, res) => {
   try {
     const { prompt } = req.body;
-    if (!prompt) {
-      return res.status(400).json({ error: "Falta el prompt" });
-    }
+    if (!prompt) return res.status(400).json({ error: "Falta el prompt" });
 
-    const response = await fetch(`https://api-inference.huggingface.co/models/${MODEL}`, {
+    const response = await fetch("https://router.huggingface.co/api/tasks/text-generation", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${HF_TOKEN}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ inputs: prompt }),
+      body: JSON.stringify({
+        inputs: prompt,
+        parameters: {
+          max_new_tokens: 500,
+          // Puedes incluir otros parámetros según lo necesites
+        },
+        options: {
+          wait_for_model: true
+        },
+      }),
     });
 
     if (!response.ok) {
@@ -37,8 +42,8 @@ app.post("/generar-dieta", async (req, res) => {
     }
 
     const data = await response.json();
-    // data es un array de resultados, tomamos el texto generado
-    const generatedText = data[0]?.generated_text || "No se obtuvo resultado";
+    // data es un arreglo de objetos con "generated_text"
+    const generatedText = data[0]?.generated_text || "No se generó texto";
 
     res.json({ dieta: generatedText });
   } catch (error) {
@@ -48,5 +53,5 @@ app.post("/generar-dieta", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor backend corriendo en http://localhost:${PORT}`);
+  console.log(`Servidor backend corriendo en el puerto ${PORT}`);
 });
