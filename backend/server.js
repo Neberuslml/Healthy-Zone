@@ -1,9 +1,7 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
-import fetch from "node-fetch"; // Si usas Node 18 o más, puedes usar fetch global.
-
-dotenv.config();
+import fs from "fs/promises";
+import path from "path";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,47 +9,55 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-const HF_TOKEN = process.env.HUGGINGFACE_API_TOKEN;
-
-app.post("/generar-dieta", async (req, res) => {
+// Ruta para obtener dietas compatibles según sexo y ejercicio
+app.post("/obtener-dietas", async (req, res) => {
   try {
-    const { prompt } = req.body;
-    if (!prompt) return res.status(400).json({ error: "Falta el prompt" });
+    const { sexo, ejercicio } = req.body;
 
-    const response = await fetch("https://router.huggingface.co/api/tasks/text-generation", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${HF_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gpt2", // Especifica aquí el modelo que quieres usar
-        inputs: prompt,
-        parameters: {
-          max_new_tokens: 500,
-        },
-        options: {
-          wait_for_model: true,
-        },
-      }),
-    });
-
-    if (!response.ok) {
-      const text = await response.text();
-      console.error("Respuesta no JSON de Hugging Face:", text);
-      return res.status(response.status).json({ error: text });
+    if (!sexo || ejercicio === undefined) {
+      return res.status(400).json({ error: "Faltan parámetros 'sexo' o 'ejercicio'" });
     }
 
-    const data = await response.json();
-    const generatedText = data[0]?.generated_text || "No se generó texto";
+    const dietasPath = path.join(process.cwd(), "dietas.json");
+    const data = await fs.readFile(dietasPath, "utf-8");
+    const dietas = JSON.parse(data);
 
-    res.json({ dieta: generatedText });
+    // Filtrar dietas por sexo y rango de ejercicio semanal
+    const dietasFiltradas = dietas.filter(d => 
+      d.sexo.toLowerCase() === sexo.toLowerCase() &&
+      ejercicio >= d.minEjercicio &&
+      ejercicio <= d.maxEjercicio
+    );
+
+    res.json({ dietas: dietasFiltradas });
   } catch (error) {
-    console.error("Error en backend:", error);
-    res.status(500).json({ error: error.message || "Error generando la dieta" });
+    console.error("Error obteniendo dietas:", error);
+    res.status(500).json({ error: "Error interno al obtener dietas" });
+  }
+});
+
+// Ruta para obtener contenido de dieta por id
+app.get("/dieta/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const dietasPath = path.join(process.cwd(), "dietas.json");
+    const data = await fs.readFile(dietasPath, "utf-8");
+    const dietas = JSON.parse(data);
+
+    const dieta = dietas.find(d => d.id === id);
+
+    if (!dieta) {
+      return res.status(404).json({ error: "Dieta no encontrada" });
+    }
+
+    res.json({ contenido: dieta.contenido });
+  } catch (error) {
+    console.error("Error obteniendo dieta:", error);
+    res.status(500).json({ error: "Error interno al obtener dieta" });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor backend corriendo en el puerto ${PORT}`);
+  console.log(`Servidor corriendo en puerto ${PORT}`);
 });
