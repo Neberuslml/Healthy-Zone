@@ -2,9 +2,9 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
-    <title>Formulario de Datos Personales - Generar Dieta</title>
+    <title>Healthy Zone - Selección de Dieta</title>
     <style>
-        /* Estilos base */
+        /* Tu CSS actual sin cambios (lo puedes mantener igual) */
         body {
             background-color: #FFEB3B;
             color: #000000;
@@ -13,7 +13,6 @@
             margin: 0;
             box-sizing: border-box;
         }
-
         form {
             background-color: #000000;
             color: #FFEB3B;
@@ -24,16 +23,15 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
             box-sizing: border-box;
         }
-
         label {
             display: block;
             margin-top: 15px;
             font-weight: bold;
             font-size: 1rem;
         }
-
         input[type="text"],
-        input[type="number"] {
+        input[type="number"],
+        select {
             width: 100%;
             padding: 12px;
             margin-top: 5px;
@@ -42,13 +40,11 @@
             font-size: 1rem;
             box-sizing: border-box;
         }
-
         input[type="radio"] {
             margin-right: 8px;
             transform: scale(1.2);
             vertical-align: middle;
         }
-
         button {
             margin-top: 25px;
             background-color: #FFEB3B;
@@ -61,12 +57,9 @@
             width: 100%;
             font-size: 1.1rem;
         }
-
         button:hover {
             background-color: #f2d600;
         }
-
-        /* Resultado */
         #resultado {
             max-width: 400px;
             margin: 20px auto;
@@ -77,42 +70,14 @@
             border: 2px solid #000000;
             padding: 15px;
             border-radius: 10px;
-            text-align: center;
+            text-align: left;
             white-space: pre-wrap;
             box-sizing: border-box;
-        }
-
-        /* Ajustes para pantallas pequeñas */
-        @media (max-width: 450px) {
-            body {
-                padding: 10px 5px;
-            }
-
-            form, #resultado {
-                max-width: 100%;
-                margin: 10px auto;
-                padding: 15px;
-            }
-
-            button {
-                padding: 12px;
-                font-size: 1rem;
-            }
-
-            input[type="text"],
-            input[type="number"] {
-                padding: 10px;
-                font-size: 1rem;
-            }
-
-            label {
-                font-size: 1rem;
-            }
         }
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">Bienvenido a Healthy Zone ingreasa tus datos</h1>
+    <h1 style="text-align: center;">Bienvenido a Healthy Zone</h1>
     <form id="datosForm">
         <label for="nombre">Nombre:</label>
         <input type="text" id="nombre" name="nombre" required />
@@ -131,62 +96,81 @@
         <label for="ejercicio">Cantidad de ejercicio semanal (horas):</label>
         <input type="number" id="ejercicio" name="ejercicio" min="0" step="0.1" required />
 
-        <button type="submit">Enviar</button>
+        <button type="submit">Buscar Dietas</button>
     </form>
+
+    <!-- Aquí aparecerá el selector de dietas -->
+    <div id="selectorDietaContainer" style="max-width: 400px; margin: 20px auto; display:none;">
+        <label for="selectorDieta">Selecciona una dieta:</label>
+        <select id="selectorDieta">
+            <option value="">-- Elige una dieta --</option>
+        </select>
+    </div>
 
     <div id="resultado"></div>
 
     <script>
-      document.getElementById("datosForm").addEventListener("submit", async function(event) {
-          event.preventDefault();
+        const form = document.getElementById("datosForm");
+        const selectorDietaContainer = document.getElementById("selectorDietaContainer");
+        const selectorDieta = document.getElementById("selectorDieta");
+        const resultadoDiv = document.getElementById("resultado");
 
-          const nombre = this.nombre.value.trim();
-          const edad = this.edad.value.trim();
-          const sexo = this.sexo.value;
-          const ejercicio = this.ejercicio.value.trim();
+        form.addEventListener("submit", async function(event) {
+            event.preventDefault();
 
-          const prompt = `Crea una dieta personalizada para una persona con las siguientes características:
-- Nombre: ${nombre}
-- Edad: ${edad} años
-- Sexo: ${sexo}
-- Ejercicio semanal: ${ejercicio} horas
+            resultadoDiv.textContent = "";
+            selectorDieta.innerHTML = '<option value="">-- Elige una dieta --</option>';
+            selectorDietaContainer.style.display = "none";
 
-Por favor, sugiere un plan alimenticio equilibrado y saludable.`;
+            const sexo = this.sexo.value;
+            const ejercicio = parseFloat(this.ejercicio.value);
 
-          const resultadoDiv = document.getElementById("resultado");
+            try {
+                const response = await fetch("https://healthy-zone.onrender.com/obtener-dietas", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ sexo, ejercicio })
+                });
 
-          try {
-              const response = await fetch("https://healthy-zone.onrender.com/generar-dieta", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ prompt })
-              });
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.error || "Error al obtener dietas");
+                }
 
-              if (!response.ok) {
-                  let errorMsg = `Error en el servidor: ${response.status} ${response.statusText}`;
-                  try {
-                      const errorData = await response.json();
-                      if (errorData.error) {
-                          errorMsg = `Error en el servidor: ${errorData.error}`;
-                      }
-                  } catch {
-                      // No se pudo obtener detalle de error
-                  }
-                  throw new Error(errorMsg);
-              }
+                const data = await response.json();
+                if (data.dietas && data.dietas.length > 0) {
+                    selectorDietaContainer.style.display = "block";
+                    data.dietas.forEach(dieta => {
+                        const option = document.createElement("option");
+                        option.value = dieta.id;
+                        option.textContent = dieta.titulo;
+                        selectorDieta.appendChild(option);
+                    });
+                } else {
+                    resultadoDiv.textContent = "No se encontraron dietas compatibles.";
+                }
+            } catch (error) {
+                resultadoDiv.textContent = "Error: " + error.message;
+            }
+        });
 
-              const data = await response.json();
-
-              if (data.dieta) {
-                  resultadoDiv.textContent = data.dieta;
-              } else {
-                  resultadoDiv.textContent = "No se recibió una respuesta válida del servidor.";
-              }
-          } catch (error) {
-              resultadoDiv.textContent = "Hubo un error: " + error.message;
-          }
-      });
+        selectorDieta.addEventListener("change", async function() {
+            const id = this.value;
+            resultadoDiv.textContent = "";
+            if (id) {
+                try {
+                    const response = await fetch(`https://healthy-zone.onrender.com/dieta/${id}`);
+                    if (!response.ok) {
+                        const errData = await response.json();
+                        throw new Error(errData.error || "Error al obtener la dieta");
+                    }
+                    const data = await response.json();
+                    resultadoDiv.textContent = data.contenido;
+                } catch (error) {
+                    resultadoDiv.textContent = "Error: " + error.message;
+                }
+            }
+        });
     </script>
 </body>
 </html>
-
