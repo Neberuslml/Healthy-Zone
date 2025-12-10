@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import fetch from "node-fetch"; // instala node-fetch si usas Node <18
+import fetch from "node-fetch";
 
 dotenv.config();
 
@@ -36,9 +36,11 @@ app.post("/generar-dieta", async (req, res) => {
     });
 
     if (!response.ok) {
-      // Intentar leer el texto en caso no sea JSON
       const text = await response.text();
+
       console.error("Respuesta no JSON de Hugging Face:", text);
+
+      // Mando el texto completo al frontend para mejor diagnóstico
       return res.status(response.status).json({ error: text });
     }
 
@@ -49,10 +51,12 @@ app.post("/generar-dieta", async (req, res) => {
     res.json({ dieta: generatedText });
   } catch (error) {
     console.error("Error en backend:", error);
-    res.status(500).json({ error: "Error generando la dieta" });
+
+    // Enviar mensaje detallado del error al frontend
+    res.status(500).json({ error: error.message || "Error generando la dieta" });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor backend corriendo en el puerto ${PORT}`);
+  console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
