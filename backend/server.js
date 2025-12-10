@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import fetch from "node-fetch"; // Necesitas instalar node-fetch si usas Node <18
+import fetch from "node-fetch"; // instala node-fetch si usas Node <18
 
 dotenv.config();
 
@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-const HF_TOKEN = process.env.HUGGINGFACE_API_TOKEN; // Tu token Hugging Face
+const HF_TOKEN = process.env.HUGGINGFACE_API_TOKEN;
 
 app.post("/generar-dieta", async (req, res) => {
   try {
@@ -28,26 +28,27 @@ app.post("/generar-dieta", async (req, res) => {
         inputs: prompt,
         parameters: {
           max_new_tokens: 500,
-          // Puedes incluir otros parámetros según lo necesites
         },
         options: {
-          wait_for_model: true
+          wait_for_model: true,
         },
       }),
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      return res.status(response.status).json({ error: errorData.error || "Error en la API de Hugging Face" });
+      // Intentar leer el texto en caso no sea JSON
+      const text = await response.text();
+      console.error("Respuesta no JSON de Hugging Face:", text);
+      return res.status(response.status).json({ error: text });
     }
 
     const data = await response.json();
-    // data es un arreglo de objetos con "generated_text"
+
     const generatedText = data[0]?.generated_text || "No se generó texto";
 
     res.json({ dieta: generatedText });
   } catch (error) {
-    console.error("Error en Hugging Face API:", error);
+    console.error("Error en backend:", error);
     res.status(500).json({ error: "Error generando la dieta" });
   }
 });
