@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import fetch from "node-fetch"; // Si usas Node <18, si usas Node 18+ omite esta línea.
+import fetch from "node-fetch"; // Si usas Node 18 o más, puedes usar fetch global.
 
 dotenv.config();
 
@@ -16,9 +16,7 @@ const HF_TOKEN = process.env.HUGGINGFACE_API_TOKEN;
 app.post("/generar-dieta", async (req, res) => {
   try {
     const { prompt } = req.body;
-    if (!prompt) {
-      return res.status(400).json({ error: "Falta el prompt" });
-    }
+    if (!prompt) return res.status(400).json({ error: "Falta el prompt" });
 
     const response = await fetch("https://router.huggingface.co/api/tasks/text-generation", {
       method: "POST",
@@ -27,9 +25,10 @@ app.post("/generar-dieta", async (req, res) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        model: "gpt2", // Especifica aquí el modelo que quieres usar
         inputs: prompt,
         parameters: {
-          max_new_tokens: 500, // Puedes ajustar según necesidad.
+          max_new_tokens: 500,
         },
         options: {
           wait_for_model: true,
