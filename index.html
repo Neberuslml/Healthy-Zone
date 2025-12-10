@@ -153,6 +153,8 @@
 
 Por favor, sugiere un plan alimenticio equilibrado y saludable.`;
 
+          const resultadoDiv = document.getElementById("resultado");
+
           try {
               const response = await fetch("https://healthy-zone.onrender.com/generar-dieta", {
                   method: "POST",
@@ -160,15 +162,30 @@ Por favor, sugiere un plan alimenticio equilibrado y saludable.`;
                   body: JSON.stringify({ prompt })
               });
 
-              if (!response.ok) throw new Error("Error en el servidor: " + response.statusText);
+              if (!response.ok) {
+                  let errorMsg = `Error en el servidor: ${response.status} ${response.statusText}`;
+                  try {
+                      const errorData = await response.json();
+                      if (errorData.error) {
+                          errorMsg = `Error en el servidor: ${errorData.error}`;
+                      }
+                  } catch {
+                      // No se pudo obtener detalle de error
+                  }
+                  throw new Error(errorMsg);
+              }
 
               const data = await response.json();
-              document.getElementById("resultado").textContent = data.dieta;
+
+              if (data.dieta) {
+                  resultadoDiv.textContent = data.dieta;
+              } else {
+                  resultadoDiv.textContent = "No se recibió una respuesta válida del servidor.";
+              }
           } catch (error) {
-              document.getElementById("resultado").textContent = "Hubo un error: " + error.message;
+              resultadoDiv.textContent = "Hubo un error: " + error.message;
           }
       });
     </script>
 </body>
 </html>
-
